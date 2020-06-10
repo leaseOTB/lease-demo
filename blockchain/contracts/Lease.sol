@@ -1,57 +1,54 @@
 pragma solidity >=0.4.21 <0.7.0;
 
 contract Lease {
+  // for frontend create a mapping object:
+  // const statusEnum = {0 : 'Failed', 1 : 'Active', 2 : 'Completed'}
+  enum LeaseStatus { Failed, Active, Completed}
   address public owner;
   address public reciever;
 
   uint public start;
 
-  // unix timestamp year
-  uint constant year = 1517769000;
-
   // window for tennant to respond to lease offer before contract expires
-  uint constant window = 0;
+  uint window = 365 days;
 
-  bool public accepted;
-  bool public completed;
+  LeaseStatus public leaseStatus;
 
   // private/restricted balance for MVP or nah?
   uint128 public balance;
   uint128 public rent;
 
-  constructor() public {
+  constructor(address _reciever) public {
     owner = msg.sender;
+    reciever = _reciever;
     // set reciever address and rent to deployment variable
-    start = 0;
+    start = now;
+    leaseStatus = LeaseStatus.Active;
   }
 
   modifier restricted() {
-    if (msg.sender == owner) _;
+    require(msg.sender == owner, "Sender not authorized");
+    _;
   }
 
   modifier recieverOnly() {
-    if (msg.sender == reciever) _;
+    require(msg.sender == reciever, "Sender not authorized");
+    _;
   }
 
   // use of block.timestamp only bad when we require <900sec accuracy, 1 year lease will be fine
   function signLease(bool isSigned) public recieverOnly {
-    if (accepted || completed ) return;
-    if (isSigned) {
-      if (start == 0) {
-        start = block.timestamp;
+    if (!checkEnd()) {
+      if (isSigned) {
+        leaseStatus = LeaseStatus.Completed;
+      } else {
+        leaseStatus = LeaseStatus.Failed;
       }
-    } else {
-      completed = true;
-      // change lease status to failed
     }
   }
 
-  function checkEnd() public {
-    if (start + year <= block.timestamp || completed) return;
-    if (start + year >= block.timestamp && !completed) {
-      completed = true;
-      // change lease status to finished
-    }
+  function checkEnd() private view returns(bool) {
+    return (leaseStatus != LeaseStatus.Active || start + window < now);
   }
 
 }
