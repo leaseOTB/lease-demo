@@ -1,6 +1,8 @@
 pragma solidity >=0.4.21 <0.7.0;
 
 contract Lease {
+  // for frontend create a mapping object:
+  // const statusEnum = {0 : 'Failed', 1 : 'Active', 2 : 'Completed'}
   enum LeaseStatus { Failed, Active, Completed}
   address public owner;
   address public reciever;
@@ -10,7 +12,7 @@ contract Lease {
   // window for tennant to respond to lease offer before contract expires
   uint window = 365 days;
 
-  LeaseStatus leaseStatus;
+  LeaseStatus public leaseStatus;
 
   // private/restricted balance for MVP or nah?
   uint128 public balance;
@@ -25,12 +27,12 @@ contract Lease {
   }
 
   modifier restricted() {
-    require(msg.sender == owner);
+    require(msg.sender == owner, "Sender not authorized");
     _;
   }
 
   modifier recieverOnly() {
-    require(msg.sender == reciever);
+    require(msg.sender == reciever, "Sender not authorized");
     _;
   }
 
@@ -46,7 +48,7 @@ contract Lease {
   }
 
   function checkEnd() private view returns(bool) {
-    return (leasStatus != LeaseStatus.Active || start + window < now);
+    return (leaseStatus != LeaseStatus.Active || start + window < now);
   }
 
 }
