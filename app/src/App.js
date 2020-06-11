@@ -1,11 +1,19 @@
 import React from "react";
 
-function App() {
+import Routes from './router/Routes'
+
+import MetaMaskContext from "./metamask";
+import MetaMaskButton from "./MetaMaskButton";
+
+export default function App() {
   return (
-    <div className="App">
-      <h1>Quorum Demo</h1>
+    <div>
+      <h3>LeaseOTB Quorum Demo</h3>
+      <MetaMaskContext.Provider immediate value={null}>
+        <MetaMaskButton />
+
+        <Routes/>
+      </MetaMaskContext.Provider>
     </div>
   );
 }
-
-export default App;
