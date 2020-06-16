@@ -1,0 +1,1 @@
+https://thegraph.com/docs/quick-start#hosted-service
