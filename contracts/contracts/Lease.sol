@@ -12,7 +12,7 @@ contract Aion {
 
 contract Lease is AccessControl {
   // for frontend create a mapping object:
-  // const statusEnum = {0 : 'Failed', 1 : 'Active', 2 : 'Completed'}
+  // const statusEnum = {0: 'Sent', 1 : 'Failed', 2 : 'Active', 3 : 'Completed'}
   enum LeaseStatus { Sent, Failed, Active, Completed}
   LeaseStatus public leaseStatus;
 
@@ -23,23 +23,27 @@ contract Lease is AccessControl {
   uint public constant year = 1517769000;
   uint public window; // window for tennant to respond to lease offer before contract expires
   uint public signTimestamp;
+  string public streetAddress;
 
   // private/restricted balance for MVP or nah?
-  uint128 public balance;
+  uint128 public balance = 0;
   uint128 public rent = 500;
-  uint32 public paymentNum;
+  uint32 public paymentNum = 0;
 
-  event LeasePayment(address indexed from, bytes32 indexed to, uint value);
-  event LeaseStatusUpdate(LeaseStatus current);
+  event LeasePayment(address indexed _from, address indexed _to, uint _value);
+  event LeaseStatusUpdate(leaseStatus _current);
 
   Aion aion;
 
-  constructor(address _sender, address _reciever) public {
+  constructor(address _sender, address _reciever, uint _rent, string storage _streetAddress, uint _signingWindow) public {
     _setupRole(LANDLORD_ROLE, _sender);
     _setupRole(TENANT_ROLE, _reciever);
 
     // set reciever address and rent to deployment variable
     start = now;
+    rent = _rent;
+    window = _signingWindow;
+    streetAddress = _streetAddress;
     leaseStatus = LeaseStatus.Sent;
     emit LeaseStatusUpdate(leaseStatus);
   }
@@ -68,7 +72,7 @@ contract Lease is AccessControl {
       uint callCost = 200000*1e9 + aion.serviceFee();
       for (uint x = 1; x<=count; x++){
         uint time = 30 days;
-        aion.ScheduleCall.value(callCost)( block.timestamp + time, address(this), 0, 200000, 1e9, data, true);
+        aion.ScheduleCall.value(callCost)(block.timestamp + time, address(this), 0, 200000, 1e9, data, true);
       }
   }
 
@@ -91,7 +95,7 @@ contract Lease is AccessControl {
     require(hasRole(TENANT_ROLE, msg.sender), "Caller is not the tenant");
     //Only accepts a complete payment at this time, future iterations need to add value transferred to balance
     require(msg.value == rent, "Innsufficent Payment");
-
+    emit LeasePayment(msg.sender, this, msg.value);
     balance += msg.value;
   }
 
