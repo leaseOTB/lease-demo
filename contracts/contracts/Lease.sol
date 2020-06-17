@@ -60,7 +60,7 @@ contract Lease is AccessControl {
   }
   //Aion Scheduling System -- can schedule transactions/function calls with or without funds
     //IMPORTANT DESIGN NOTE: we are scheduling function calls to check the current balance, not scheduling fund transfers
-    //TO-DO: create fee estimation model based off data from mainnet aion contract 
+    //TO-DO: create fee estimation model based off data from mainnet aion contract
     //S
   function schedulePayments(uint32 count) internal {
       aion = Aion(0xFcFB45679539667f7ed55FA59A15c8Cad73d9a4E);
@@ -70,12 +70,36 @@ contract Lease is AccessControl {
         uint time = 30 days;
         aion.ScheduleCall.value(callCost)( block.timestamp + time, address(this), 0, 200000, 1e9, data, true);
       }
-      paymentNum++;
   }
 
   function checkBalance() internal {
-
+    if (balance < rent) {
+      leaseStatus = LeaseStatus.Failed;
+    } else {
+      leaseStatus = LeaseStatus.Active;
+      paymentNum++;
+      if (paymentNum == 12) {
+        leaseStatus = LeaseStatus.Complete;
+      }
+      balance = 0;
+    }
     emit LeaseStatusUpdate(leaseStatus);
+
   }
+
+  function payRent() public payable {
+    require(hasRole(TENANT_ROLE, msg.sender), "Caller is not the tenant");
+    //Only accepts a complete payment at this time, future iterations need to add value transferred to balance
+    require(msg.value == rent, "Innsufficent Payment");
+
+    balance += msg.value;
+  }
+
+  function withdrawRent(uint amount) public {
+    require(hasRole(LANDLORD_ROLE, msg.sender), "Caller is not the landlord");
+
+    msg.sender.transfer(amount);
+  }
+
 
 }
