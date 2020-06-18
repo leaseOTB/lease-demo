@@ -2,23 +2,25 @@
 pragma solidity ^0.6.0;
 
 import "../node_modules/@openzeppelin/contracts/access/AccessControl.sol";
-contract Aion {
+
+abstract contract Aion{
     uint256 public serviceFee;
-    function ScheduleCall(
-      uint256 blocknumber, address to, uint256 value, uint256 gaslimit, uint256 gasprice, bytes data, bool schedType
-    ) public payable returns (uint);
+    function ScheduleCall (
+      uint256 blocknumber, address to, uint256 value, uint256 gaslimit, uint256 gasprice, bytes memory data, bool schedType
+    ) public virtual payable returns (uint);
 }
 
 
 contract Lease is AccessControl {
   // for frontend create a mapping object:
   // const statusEnum = {0: 'Sent', 1 : 'Failed', 2 : 'Active', 3 : 'Completed'}
-  enum LeaseStatus { Sent, Failed, Active, Completed}
+  enum LeaseStatus { Sent, Failed, Active, Complete}
   LeaseStatus public leaseStatus;
 
   bytes32 public constant LANDLORD_ROLE = keccak256("LANDLORD_ROLE");
   bytes32 public constant TENANT_ROLE = keccak256("TENANT_ROLE");
 
+  // ALL TIMES IN UNIX EPOCH TIMESTAMP
   uint public start;
   uint public constant year = 1517769000;
   uint public window; // window for tennant to respond to lease offer before contract expires
@@ -26,23 +28,26 @@ contract Lease is AccessControl {
   string public streetAddress;
 
   // private/restricted balance for MVP or nah?
-  uint128 public balance = 0;
-  uint128 public rent = 500;
+  uint256 public balance = 0;
+  uint256 public rent;
   uint32 public paymentNum = 0;
 
-  event LeasePayment(address indexed _from, address indexed _to, uint _value);
-  event LeaseStatusUpdate(leaseStatus _current);
+  event LeasePayment(address indexed _from, uint _value);
+  event LeaseStatusUpdate(LeaseStatus _current);
 
   Aion aion;
 
-  constructor(address _sender, address _reciever, uint _rent, string storage _streetAddress, uint _signingWindow) public {
-    _setupRole(LANDLORD_ROLE, _sender);
+  constructor(address _reciever, string memory _streetAddress) public {
+    // _setupRole(LANDLORD_ROLE, _sender)
+    _setupRole(LANDLORD_ROLE, msg.sender);
     _setupRole(TENANT_ROLE, _reciever);
 
-    // set reciever address and rent to deployment variable
     start = now;
-    rent = _rent;
-    window = _signingWindow;
+    // NEEDS CONSTUCTOR -> current value 1 ETH
+    rent = 1 ether;
+    // NEEDS CONSTRUCTOR -> current value 6/25/2020 @ 4:35PM GMT
+    window = 1593102912;
+
     streetAddress = _streetAddress;
     leaseStatus = LeaseStatus.Sent;
     emit LeaseStatusUpdate(leaseStatus);
@@ -72,7 +77,7 @@ contract Lease is AccessControl {
       uint callCost = 200000*1e9 + aion.serviceFee();
       for (uint x = 1; x<=count; x++){
         uint time = 30 days;
-        aion.ScheduleCall.value(callCost)(block.timestamp + time, address(this), 0, 200000, 1e9, data, true);
+        aion.ScheduleCall.value(callCost)(now + time, address(this), 0, 200000, 1e9, data, true);
       }
   }
 
@@ -95,7 +100,8 @@ contract Lease is AccessControl {
     require(hasRole(TENANT_ROLE, msg.sender), "Caller is not the tenant");
     //Only accepts a complete payment at this time, future iterations need to add value transferred to balance
     require(msg.value == rent, "Innsufficent Payment");
-    emit LeasePayment(msg.sender, this, msg.value);
+    //Removed reicever address due to duplication, events are already tracked at contract level
+    emit LeasePayment(msg.sender, msg.value);
     balance += msg.value;
   }
 
