@@ -47,7 +47,8 @@ contract Lease is AccessControl {
     rent = 1 ether;
     // NEEDS CONSTRUCTOR -> current value 6/25/2020 @ 4:35PM GMT
     window = 1593102912;
-
+    
+    // NEEDS PROPER CONSTRUCTOR -> IPFS metadata hash saved in contract
     streetAddress = _streetAddress;
     leaseStatus = LeaseStatus.Sent;
     emit LeaseStatusUpdate(leaseStatus);
