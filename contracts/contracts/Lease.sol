@@ -37,9 +37,9 @@ contract Lease is AccessControl {
 
   Aion aion;
 
-  constructor(address _reciever, string memory _streetAddress) public {
+  constructor(address _sender, address _reciever, string memory _streetAddress) public {
     // _setupRole(LANDLORD_ROLE, _sender)
-    _setupRole(LANDLORD_ROLE, msg.sender);
+    _setupRole(LANDLORD_ROLE, _sender);
     _setupRole(TENANT_ROLE, _reciever);
 
     start = now;
