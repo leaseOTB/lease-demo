@@ -11,17 +11,11 @@ const Routes = () => {
   return (
     <BrowserRouter>
       <Switch>
-        <Route path='/'>
+        <Route exact path='/'>
           <LeaseSearch/>
         </Route>
-        <AuthRoute path='/send/'>
-          <LeaseNew/>
-        </AuthRoute>
-        <AuthRoute path='/pending'>
-          <LeasePending/>
-        </AuthRoute>
-        <Route path='/lease/:leaseID'>
-          <LeasePage/>
+        <Route exact path='/send'>
+          <LeaseNew />
         </Route>
       </Switch>
     </BrowserRouter>

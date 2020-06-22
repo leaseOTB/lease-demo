@@ -1,6 +1,7 @@
 import React, { useContext } from "react";
 
 import MetaMaskContext from "../context/metamask";
+import { MetaMaskButton as Button } from 'rimble-ui'
 
 export default function MetaMaskButton() {
   const { web3, accounts, error, awaiting, openMetaMask } = useContext(
@@ -19,29 +20,29 @@ export default function MetaMaskButton() {
     );
   } else if (error) {
     return (
-      <button type="button" onClick={openMetaMask}>
+      <Button type="button" onClick={openMetaMask}>
         {error.message}
-      </button>
+      </Button>
     );
   } else if (!web3 && awaiting) {
     return (
-      <button type="button" onClick={openMetaMask}>
+      <Button type="button" onClick={openMetaMask}>
         MetaMask loading...
-      </button>
+      </Button>
     );
   } else if (!web3) {
     return (
-      <button type="button" onClick={openMetaMask}>
+      <Button type="button" onClick={openMetaMask}>
         Please open and allow MetaMask
-      </button>
+      </Button>
     );
   } else if (accounts.length === 0) {
-    return <button type="button">No Wallet 🦊</button>;
+    return <Button type="button">No Wallet</Button>;
   } else {
     return (
-      <button type="button" onClick={handleButtonClick}>
-        <code>{accounts[0].slice(0, 16)}</code> 🦊
-      </button>
+      <Button type="button" onClick={handleButtonClick}>
+        <code>{accounts[0].slice(0, 16)}</code>
+      </Button>
     );
   }
 }
