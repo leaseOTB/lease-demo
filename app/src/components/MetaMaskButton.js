@@ -1,6 +1,6 @@
 import React, { useContext } from "react";
 
-import MetaMaskContext from "./metamask";
+import MetaMaskContext from "../context/metamask";
 
 export default function MetaMaskButton() {
   const { web3, accounts, error, awaiting, openMetaMask } = useContext(
