@@ -109,7 +109,7 @@ const LeaseNew = () => {
           )}
         </div>
         <div className="mb-4">
-          <label className="text-gray-700" htmlFor="unitNumber">
+          <label className="text-gray-700" htmlFor="BIN">
             Building number
           </label>
           <input
@@ -118,8 +118,24 @@ const LeaseNew = () => {
             className="field"
             type="text"
           />
-          {errors.BIN && errors.unitNumber.type === "required" && (
+          {errors.BIN && errors.BIN.type === "required" && (
             <h1 className="error">Building ID number is required*</h1>
+          )}
+        </div>
+        <div className="mb-4 flex flex-col">
+          <label for="img" className="text-gray-700 mr-4 pb-2">
+            Select image:
+          </label>
+          <input
+            type="file"
+            id="img"
+            name="imgUpload"
+            accept="image/*"
+            className="w-full bg-gray-200 text-gray-500 rounded p-1 outline-none"
+            ref={register({ required: true })}
+          />
+          {errors.imgUpload && errors.imgUpload.type === "required" && (
+            <h1 className="error">Please upload an image of the lease*</h1>
           )}
         </div>
         <button type="submit" className="btn">
