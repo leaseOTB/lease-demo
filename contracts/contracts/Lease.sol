@@ -19,14 +19,13 @@ contract Lease is AccessControl {
 
   bytes32 public constant LANDLORD_ROLE = keccak256("LANDLORD_ROLE");
   bytes32 public constant TENANT_ROLE = keccak256("TENANT_ROLE");
+  string public IPFS_HASH;
 
   // ALL TIMES IN UNIX EPOCH TIMESTAMP
   uint public start;
   uint public constant year = 1517769000;
   uint public window; // window for tennant to respond to lease offer before contract expires
   uint public signTimestamp;
-  string public streetAddress;
-
   // private/restricted balance for MVP or nah?
   uint256 public balance = 0;
   uint256 public rent;
@@ -37,7 +36,7 @@ contract Lease is AccessControl {
 
   Aion aion;
 
-  constructor(address _sender, address _reciever, string memory _streetAddress) public {
+  constructor(address _sender, address _reciever, string memory _ipfs) public {
     // _setupRole(LANDLORD_ROLE, _sender)
     _setupRole(LANDLORD_ROLE, _sender);
     _setupRole(TENANT_ROLE, _reciever);
@@ -49,7 +48,8 @@ contract Lease is AccessControl {
     window = 1593102912;
     
     // NEEDS PROPER CONSTRUCTOR -> IPFS metadata hash saved in contract
-    streetAddress = _streetAddress;
+    IPFS_HASH = _ipfs;
+    
     leaseStatus = LeaseStatus.Sent;
     emit LeaseStatusUpdate(leaseStatus);
   }
@@ -111,6 +111,4 @@ contract Lease is AccessControl {
 
     msg.sender.transfer(amount);
   }
-
-
 }

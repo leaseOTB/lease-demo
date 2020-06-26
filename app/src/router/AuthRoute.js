@@ -1,6 +1,6 @@
 import React, { useContext } from 'react'
 import { Redirect, Route } from 'react-router'
-import MetaMaskContext from "../metamask";
+import MetaMaskContext from "../context/metamask";
 
 export default ({ render, ...routeProps }) => {
   const { web3 } = useContext(MetaMaskContext)

@@ -1,5 +1,6 @@
 import React from 'react'
 import {LeaseSearchBar, LeaseSearchResults} from '@leaseotb/ui-components'
+import { Button, Link } from "rimble-ui";
 
 const LeaseSearch = () => {
   
@@ -18,13 +19,8 @@ const LeaseSearch = () => {
   return (
     <div>
       <br/>
-    
-      <LeaseSearchBar></LeaseSearchBar>
-
-      <br/>
-      <hr/>
-
-      <LeaseSearchResults data={mock}></LeaseSearchResults>
+      <Link href='/send'>Send a New Lease</Link>
+      
     </div>
   )
 }

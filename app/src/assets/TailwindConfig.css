@@ -1,0 +1,32 @@
+@tailwind base;
+
+@tailwind components;
+
+.field {
+  @apply block w-full bg-gray-200 rounded-lg px-4 py-2 outline-none border border-transparent leading-normal text-gray-600 mt-2;
+}
+
+.field:focus {
+  @apply bg-white outline-none border-gray-300;
+}
+
+.label {
+  @apply text-gray-700;
+}
+
+.btn {
+  @apply font-bold py-2 px-4 rounded bg-white text-gray-900 font-semibold;
+}
+
+.btn:hover {
+  @apply bg-gray-400;
+}
+
+.btn:focus {
+  @apply outline-none;
+}
+
+.error {
+  @apply pt-1 text-red-600;
+}
+@tailwind utilities;
